@@ -60,6 +60,7 @@ void split_cmd(char* cmd, int* ac, char* av[]) {
 				cmd[j] = '\0';
 				av[i] = &cmd[j + 1];
 				i++;
+				j++;
 				*ac += 1;
 			}
 		}
