@@ -5,24 +5,26 @@
 #define MAXCMDLEN 256
 #define MAXWORDNUM 80
 
-void split_cmd(char* cmd, int* ac, char* av[]);
+void split_cmd(char *cmd, int *ac, char *av[]);
 
+void split_proc(int procID, int ac, char *av[], int Pac, char *Pav[]);
 
 void print_arg(char* arg);
-void print_args(int ac, char** av);
 
-int countPiPe(int ac, char *av[]);
-//acの代わりに関数で管理，過去プロセスの状態を記録する
-//関数の中身：return はac，
+void print_args(int ac, char **av);
 
-int cp = 0;
+int count_pipe(int ac, char *av[]);
 
 int main (){
+	int i;
+
 	char *av[MAXWORDNUM];
 	char *Pav[MAXWORDNUM];
 	int ac;
-
+	int Pac;
+	int procID;
 	while(1) {
+		procID = 0;
 		ac = 1;
 		char cmd[MAXCMDLEN] = {0};
 
@@ -32,12 +34,15 @@ int main (){
 		}
 
 		split_cmd(cmd, &ac, av);
-		
-		fork();
-		cp++;
-		printf("Pac: %d", countPipe(cp, av));
-		
+
 		print_args(ac, av);
+		printf("count_pipe: %d\n", count_pipe(ac, av));
+
+		for (i = 0; i < count_pipe(ac, av) + 1; i++) {
+			procID++;
+			split_proc(procID, ac, av, Pac, Pav);
+		}
+		
 	}
 
 	return 0;
@@ -47,6 +52,7 @@ int main (){
 void split_cmd(char* cmd, int* ac, char* av[]) {
 	int i, j;
 	j = 0;
+	// *ac = 0;
 
 	av[0] = &cmd[0];
 
@@ -86,46 +92,53 @@ void print_arg(char* arg) {
 
 void print_args(int ac, char** av) {
 	int i;
+	printf("ac: %d\n", ac);
 	for (i = 0; i < ac; i++) {
-		print_arg(av[i]);
+		printf("av[%d]: %s\n", i, av[i]);
+		// print_arg(av[i]);
 	}
 }
 
 
 
-void split Proc() {
+void split_proc(int procID, int ac, char *av[], int Pac, char *Pav[]) {
 
 	int i;
-	int a;
-	a = countPipe(ac, av);
-		
-	for (i = 0; i < a ;i++) {
-	printf("process 1\n")
-	printf("Pac: %d\n", countPipe(cp, av));
-	printf("Pav: %s\n", av);
+	int j;
+
+
+	for (i = 1, j = 0; i < ac; i++) {
+		if (av[i] == '|') {
+			// *procID += 1;
+			break;
+		}
+	
+		if (av[i] == ' ' || av[i] == '\t' || av[i] == '<' ||
+			av[i] == '>' || av[i] == '&') {
+			i++;
+		} else {
+			Pav[j] = av[i];
+			Pac++;
+			j++;
+		}
+	}
+	// *procID += 1;
+	printf("ProcID: %d\n", procID);
+	// printf("Pac: %d\n", count_pipe(Pac, &Pav));
+	// printf("Pav: \n");
 
 }
 
+int count_pipe(int ac, char *av[]){
+	int i;
+	int n = 0;
 
+	for (i = 0; i < ac; i++) {
+		if (*av[i] == '|') {
+		// if (strcmp(av[i], "|")) {
+			n++;
+		}
+	}
 
-
-int countPipe(int ac, char *av[]){
-
-	return ac;
+	return n;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
