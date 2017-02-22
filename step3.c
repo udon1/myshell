@@ -15,15 +15,13 @@ void print_args(int ac, char **av);
 
 int count_pipe(int ac, char *av[]);
 
-int avnum = 0;
-
 int main (){
 	int i;
 
 	char *av[MAXWORDNUM];
-	char *Pav[MAXWORDNUM];
+	char *pav[MAXWORDNUM];
 	int ac;
-	int Pac;
+	int pac;
 	int procID;
 	while(1) {
 		procID = 0;
@@ -41,10 +39,9 @@ int main (){
 		printf("count_pipe: %d\n", count_pipe(ac, av));
 
 		for (i = 0; i < count_pipe(ac, av) + 1; i++) {
+			split_proc(procID, ac, av, &pac, pav);
 			procID++;
-			split_proc(procID, ac, av, &Pac, Pav);
 		}
-		avnum = 0;
 	}
 
 	return 0;
@@ -103,36 +100,34 @@ void print_args(int ac, char** av) {
 
 
 
-void split_proc(int procID, int ac, char *av[], int *Pac, char *Pav[]) {
+void split_proc(int procID, int ac, char *av[], int *pac, char *pav[]) {
 	int i;
-	int Pac2;
-	Pac2 = 0;
+	*pac = 0;
+	static int avnum;
+	int pavnum = 0;
 
-	for (i = avnum ; i < ac; i++) {
-		if (*av[i] == '|') {
-			// *procID += 1;
-			avnum++;
-			break;
-		}
-	
-//		if (*av[i] == ' ' || *av[i] == '\t' || *av[i] == '<' ||
-//			*av[i] == '>' || *av[i] == '&') {
-//			i++;
-//		} else {
-			Pav[procID - 1] = av[avnum];
-//			Pac++;
-			Pac2++;
-			avnum++;
-//		}
+	if (procID == 0) {
+		avnum = 0;
+	} else {
+		avnum++;
 	}
-	// procID += 1;
+
+
+	for (i = 0; i < ac && *av[avnum] == '|'; avnum++) {
+		pav[pavnum] = av[avnum];
+		pavnum++;
+	}
+
+	pav[pavnum] = NULL;
+	*pac = pavnum;
+
 	printf("ProcID: %d\n", procID);
-//	printf("Pac: %d\n", count_pipe(Pac, &Pav));
-	printf("Pac: %d\n", Pac2);
-//	printf("Pav: %s\n", *Pav);
-	
-	for (i = 0; i < Pac2; i++) {
-		printf("Pav[%d]: %s\n", i, Pav[i]); 
+	//	printf("Pac: %d\n", count_pipe(pac, &pav));
+	printf("Pac: %d\n", *pac);
+	//	printf("Pav: %s\n", *pav);
+
+	for (i = 0; i < *pac; i++) {
+		printf("Pav[%d]: %s\n", procID, pav[pavnum]);
 	}
 
 }
@@ -143,7 +138,6 @@ int count_pipe(int ac, char *av[]){
 
 	for (i = 0; i < ac; i++) {
 		if (*av[i] == '|') {
-		// if (strcmp(av[i], "|")) {
 			n++;
 		}
 	}
