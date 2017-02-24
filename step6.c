@@ -43,11 +43,15 @@ int main (){
 
 		//print_args(ac, av);
 		//printf("count_pipe: %d\n", count_pipe(ac, av));
+		av[ac] = NULL;
 
 		for (i = 0; i < count_pipe(ac, av) + 1; i++) {
 			split_proc(procID, ac, av, &pac, pav);
 			procID++;
 
+		if (!strcmp(pav[0], "exit")) {
+			exit(0);
+		}
 			pid = fork();
 			if (pid < 0) {
 				printf("Error\n");
@@ -56,8 +60,8 @@ int main (){
 			} else {
 				wait(status);
 			}
+
 		}
-		av[ac] = NULL;
 		//printf("pav[0]: %s\n", pav[0]);
 		//printf("pav[pac]: %s\n", pav[pac]);
 		//printf("av[ac - 1]: %s\n", av[ac - 1]);
@@ -76,7 +80,7 @@ void split_cmd(char* cmd, int* ac, char* av[]) {
 	for (i = 0; i < MAXCMDLEN; i++) {
 		if (cmd[i] == '\n') {
 			cmd[i] = '\0';
-			}
+		}
 	}
 
 	for (i = 1; i < MAXWORDNUM;i++) {
@@ -108,9 +112,9 @@ void split_cmd(char* cmd, int* ac, char* av[]) {
 	}
 
 	//for (i = 0; i < MAXWORDNUM; i++) {
-		//if (*av[i] == '\n') {
-			//*av[i] = '\0';
-		//}
+	//if (*av[i] == '\n') {
+	//*av[i] = '\0';
+	//}
 	//}
 
 
